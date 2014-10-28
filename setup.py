@@ -9,6 +9,8 @@ setup(
     version=version,
     packages=find_packages(),
     scripts=scripts,
+    include_package_data=True,
+    zip_safe=False,
     # include_package_data = True,    # include everything in source control
     # exclude_package_data = { '': ['README.txt'] },
     # Project uses reStructuredText, so ensure that the docutils get
@@ -24,10 +26,10 @@ setup(
     },
 
     # metadata for upload to PyPI
-    author="KennyZhang",
+    author="Kenny Zhang",
     author_email="sphy@foxmail.com",
-    description="server",
-    license="GPL",
+    description='A easy used python database connection pool',
+    license="BSD",
     keywords="database pool",
     url="https://github.com/philoprove/dbpool",
     # could also include long_description, download_url, classifiers, etc.
