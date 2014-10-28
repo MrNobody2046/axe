@@ -2,7 +2,7 @@ import functools
 import threading
 import Queue
 import warnings
-import MySQLdb
+import pymysql as MySQLdb
 
 
 MAX_CONNECTIONS = 100
@@ -12,6 +12,7 @@ class BaseHandler(object):
     """
 
     """
+
     def __init__(self, conn_name, conn):
         self._name = conn_name
         self._conn = conn
@@ -233,7 +234,8 @@ class DataBaseConnector(object):
         try:
             return self._current._connection_handler
         except:
-            warnings.warn("not specified connection handler in current thread, use root connect handler", RuntimeWarning)
+            warnings.warn("not specified connection handler in current thread, use root connect handler",
+                          RuntimeWarning)
             return self._root_connection_handler
 
     @property
@@ -325,8 +327,11 @@ dbc_instance = DataBaseConnector(BaseHandler, delegate=True)
 
 def with_db(db=None, lazy_load=True):
     """
-    :param db:database connection name
-    :return:the decorator with specific db connection
+    :param db: string database connection name
+    :param lazy_load: if use lazy_load, not check connection util use this connection.
+    this option usually used to decorate class method , because add database often done
+    after instantiation.
+    :return:
     """
     if not lazy_load:
         if not db:
@@ -370,29 +375,3 @@ def get_db_decorator(handler=BaseHandler, **connection_kwargs):
 
     return _with_db
 
-
-if __name__ == "__main__":
-    dbc_instance.add_database("rdb", host="127.0.0.1",
-                              port=3306,
-                              user="root",
-                              passwd="zxc",
-                              db="test",
-                              charset="utf8",
-                              use_unicode=True)
-    import time, random
-
-    def test():
-        @with_db(db='rdb')
-        def _test():
-            dbc_instance.handler.show_tables()
-
-        ras = random.random()
-        time.sleep(ras)
-        _test()
-
-    ths_test = [threading.Thread(target=test).start() for i in range(1000)]
-    time.sleep(1)
-    connection_pool = dbc_instance.get_database("rdb")
-    # connection_pool.close()
-    print "Queue size:", connection_pool.queue.qsize(), "Peak conns:", connection_pool._peak_connection_count
-    print connection_pool._open_connections
