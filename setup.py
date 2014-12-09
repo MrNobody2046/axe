@@ -5,7 +5,7 @@ scripts = []
 version = 0.1
 
 setup(
-    name="dbpool",
+    name="axe",
     version=version,
     packages=find_packages(),
     scripts=scripts,
@@ -28,9 +28,9 @@ setup(
     # metadata for upload to PyPI
     author="Kenny Zhang",
     author_email="sphy@foxmail.com",
-    description='A easy used python database connection pool',
+    description='',
     license="BSD",
     keywords="database pool",
-    url="https://github.com/philoprove/dbpool",
+    url="https://github.com/philoprove/axe",
     # could also include long_description, download_url, classifiers, etc.
 )
