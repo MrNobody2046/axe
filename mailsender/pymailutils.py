@@ -1,5 +1,8 @@
+#!/usr/bin/env python
+# coding:utf-8
 import os
 import codecs
+import logging
 
 
 class MailSender():
@@ -32,8 +35,20 @@ class MailSender():
         sh = self.template % self.__dict__
         if not self.html:
             sh = sh.replace('Content-Type:text/html;charset="utf-8" ', '')
+        logging.warning("exec: %s", sh)
         os.popen(sh)
+        os.remove(self.tmp_file)
 
 
 if __name__ == "__main__":
-    ms = MailSender('just test', '775239419@qq.com', 'how are you today?')()
+    from optparse import OptionParser
+
+    parser = OptionParser()
+    parser.add_option("-s", "--subject", dest="subject", default="",
+                      help="write subject")
+    parser.add_option("-c", "--content", dest="content", default="",
+                      help="mail content")
+    parser.add_option("-t", "--mailto", dest="mailto",
+                      help="mail address")
+    options, args = parser.parse_args()
+    ms = MailSender(options.subject, options.mailto, options.content)()
