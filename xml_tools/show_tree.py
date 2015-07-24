@@ -1,5 +1,5 @@
 # coding: utf-8
-import cStringIO
+from optparse import OptionParser
 from lxml import etree
 
 
@@ -91,5 +91,14 @@ class NodeMgr(object):
 
 
 if __name__ == "__main__":
-    pass
+    parser = OptionParser()
+    parser.add_option("-f", "--file", dest="filename",
+                      help="xml file path", metavar="FILE")
+    parser.add_option("-i", "--indent",
+                      action="store_false", dest="verbose", default=True,
+                      help="your tree indent")
+
+    (options, args) = parser.parse_args()
+
+    NodeMgr(open(options.filename)).print_tree()
 
