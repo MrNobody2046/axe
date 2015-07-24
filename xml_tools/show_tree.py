@@ -1,12 +1,15 @@
 # coding: utf-8
+import logging
 from optparse import OptionParser
+from collections import OrderedDict
+
 from lxml import etree
 
 
 class Node(object):
     def __init__(self, name, parent=None):
         self.name = name
-        self.children = {}
+        self.children = OrderedDict()
         self.parent = parent
         self.value = None
 
@@ -19,14 +22,14 @@ class Node(object):
 
     get_child = add_child
 
-    def bfs(self, call_back=lambda x: x, leaf_stickied=True):
+    def bfs(self, call_back=lambda x: x, sort=False):
         call_back(self)
-        if leaf_stickied:
-            children = sorted(self.children.values(), key=lambda x: x.is_leaf, reverse=True)
+        if sort:
+            children = sorted(self.children.values(), key=lambda x: (not x.is_leaf, x.name))
         else:
             children = self.children.values()
         for c in children:
-            c.bfs(call_back=call_back, leaf_stickied=leaf_stickied)
+            c.bfs(call_back=call_back, sort=sort)
 
     @property
     def is_leaf(self):
@@ -38,6 +41,10 @@ class Node(object):
             return 1 + self.parent.deepness
         else:
             return 1
+
+    @property
+    def is_root(self):
+        return not self.parent
 
 
 class NodeMgr(object):
@@ -70,7 +77,7 @@ class NodeMgr(object):
                         self.path_keys.add(path_key)
                         self.append_path_on_tree(path)
             except Exception, e:
-                print e
+                logging.exception(e)
             finally:
                 elem.clear()
 
@@ -82,23 +89,28 @@ class NodeMgr(object):
     @staticmethod
     def make_print_tree(indent):
         def print_tree(node):
-            print indent * (node.deepness - 1) + node.name
-
+            if node.is_root:
+                print node.name + "(root)"
+            else:
+                print '|' + indent * (node.deepness - 2) + "--- " + node.name
         return print_tree
 
-    def print_tree(self, indent="\t|"):
-        self.root.bfs(call_back=self.make_print_tree(indent))
+    def show_tree(self, indent="|   ", sort=False):
+        self.root.bfs(call_back=self.make_print_tree(indent), sort=sort)
+
+
+def show_tree(filename, sort, indent):
+    NodeMgr(open(filename)).show_tree(indent=indent, sort=sort)
 
 
 if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option("-f", "--file", dest="filename",
-                      help="xml file path", metavar="FILE")
-    parser.add_option("-i", "--indent",
-                      action="store_false", dest="verbose", default=True,
-                      help="your tree indent")
+    parser.add_option("-f", "--file", dest="filename", help="xml file path", metavar="FILE")
+    parser.add_option("-s", "--sort", dest="sort", default=False, help="sorted xml node by node name")
+    parser.add_option("-i", "--indent", dest="indent", default="    |", help="your tree indent")
 
     (options, args) = parser.parse_args()
+    filename = options.filename if options.filename else args[-1]
+    print options, args
 
-    NodeMgr(open(options.filename)).print_tree()
-
+    show_tree(filename, options.sort and True, options.indent)
