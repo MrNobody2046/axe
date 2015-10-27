@@ -11,7 +11,8 @@ class Anything(object):
     random_value = True
 
     def __init__(self, *args, **kwargs):
-        pass
+        self.__args = args
+        self.__kwargs = kwargs
 
     def __getattr__(self, item):
         return Anything()
@@ -32,6 +33,27 @@ class Anything(object):
         self._cu = self.max_iteration_length
         return self
 
+    def __add__(self, other):
+        return Anything()
+
+    def __sub__(self, other):
+        return Anything()
+
+    def __abs__(self):
+        return 1
+
+    def __eq__(self, other):
+        if isinstance(other,Anything):
+            return True
+        else:
+            return False
+
+    def __div__(self, other):
+        return Anything()
+
+    def __mul__(self, other):
+        return Anything()
+
     def next(self):
         if self._cu:
             self._cu -= 1
@@ -41,6 +63,7 @@ class Anything(object):
 
     def items(self):
         return [(i, Anything()) for i in range(self.max_iteration_length)]
+
 
     __repr__ = __str__
 
