@@ -44,9 +44,9 @@ if __name__ == "__main__":
     from optparse import OptionParser
 
     parser = OptionParser()
-    parser.add_option("-s", "--subject", dest="subject", default="",
+    parser.add_option("-s", "--subject", dest="subject", default="No Subject",
                       help="write subject")
-    parser.add_option("-c", "--content", dest="content", default="",
+    parser.add_option("-c", "--content", dest="content", default="No Content",
                       help="mail content")
     parser.add_option("-t", "--mailto", dest="mailto",
                       help="mail address")
